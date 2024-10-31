@@ -106,16 +106,16 @@ export const createNewProject = async ({
   title,
   description,
   image,
-  thumbnail,
   details,
   deploy,
+  contributors
 }: {
   title: string;
   description: string;
   image: string;
-  thumbnail: string;
   details: string;
   deploy: string;
+  contributors: string;
 }) => {
   try {
     // Create a new document in the projects collection
@@ -127,9 +127,9 @@ export const createNewProject = async ({
         title,
         description,
         image,
-        thumbnail,
         details,
         deploy,
+        contributors,
       }
     );
 

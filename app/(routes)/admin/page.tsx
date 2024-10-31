@@ -24,17 +24,16 @@ const AdminPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [projects, setProjects] = useState<any[]>([]); // Stores fetched projects
+  const [projects, setProjects] = useState<any[]>([]);
 
   // States for form inputs
   const [imageFile, setImageFile] = useState<File>();
-  const [thumbnailFile, setThumbnailFile] = useState<File>();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deploy, setDeploy] = useState("");
   const [details, setDetails] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [contributors, setContributors] = useState("");
 
   const { edgestore } = useEdgeStore();
 
@@ -48,17 +47,17 @@ const AdminPage = () => {
           appwriteConfig.userCollectionId,
           [Query.equal("userId", currentUser.$id)]
         );
-
         const userDoc = response.documents[0];
-        if (!userDoc) throw new Error("User document not found");
-
-        if (userDoc.role !== "ROLE_ADMIN") {
+        if (!userDoc || userDoc.role !== "ROLE_ADMIN") {
           router.push("/");
-        } else {
-          setUser(userDoc);
+          return;
         }
+        setUser(userDoc);
       } catch (error) {
-        console.error("No active session or user is not an admin:", error);
+        console.error(
+          "No active session or error in checking user access:",
+          error
+        );
         router.push("/");
       } finally {
         setLoading(false);
@@ -69,19 +68,19 @@ const AdminPage = () => {
   }, [router]);
 
   // Fetch projects
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await databases.listDocuments(
-          appwriteConfig.databaseId,
-          appwriteConfig.projectCollectionId
-        );
-        setProjects(response.documents);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const response = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.projectCollectionId
+      );
+      setProjects(response.documents);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, []);
 
@@ -90,59 +89,45 @@ const AdminPage = () => {
     if (imageFile) {
       const res = await edgestore.publicFiles.upload({
         file: imageFile,
-        onProgressChange: (progress) => {
-          console.log(progress);
-        },
+        onProgressChange: (progress) => console.log(progress),
       });
-      console.log(res.url);
       setImageUrl(res.url);
-    }
-  };
-
-  // Handle thumbnail upload
-  const handleThumbnailUpload = async () => {
-    if (thumbnailFile) {
-      const res = await edgestore.publicFiles.upload({
-        file: thumbnailFile,
-        onProgressChange: (progress) => {
-          console.log(progress);
-        },
-      });
-      console.log(res.url);
-      setThumbnailUrl(res.url);
     }
   };
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    console.log(imageUrl);
+
     try {
-      await handleImageUpload();
-      await handleThumbnailUpload();
-      
-      // Now you can use the uploaded image and thumbnail URLs with your other form data
       const newProject = {
         title: title,
         description: description,
         image: imageUrl,
-        thumbnail: thumbnailUrl,
         details: details,
         deploy: deploy,
+        contributors: contributors,
       };
-  
       console.log("New project data:", newProject);
       await createNewProject(newProject);
-  
-      // Show a success alert after project is created
+
+      fetchProjects(); // Refresh the project list
+
+      // Clear form inputs
+      setTitle("");
+      setDescription("");
+      setDeploy("");
+      setDetails("");
+      setContributors("");
+      setImageFile(undefined);
+      setImageUrl("");
       alert("Project added successfully!");
-  
     } catch (error) {
       console.error("Error adding project:", error);
       alert("An error occurred while adding the project.");
     }
   };
-  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -150,12 +135,10 @@ const AdminPage = () => {
 
   return (
     <div className="relative justify-center items-center">
-      {/* Static Background */}
       <div className="fixed h-screen w-full dark:bg-black bg-white dark:bg-dot-white/[0.2] bg-dot-black/[0.2]">
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       </div>
 
-      {/* Content */}
       <div className="relative z-10">
         {user?.username === "alexvieru" && (
           <div className="flex justify-center items-center">
@@ -166,7 +149,6 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* Project List */}
         <div className="mt-10 flex flex-col items-center">
           {projects.length > 0 ? (
             <ul className="space-y-4">
@@ -188,6 +170,7 @@ const AdminPage = () => {
             <p className="text-gray-500 dark:text-gray-300">No projects yet</p>
           )}
         </div>
+
         <div className="mt-10 flex justify-center items-center">
           <Modal>
             <ModalTrigger>
@@ -202,32 +185,27 @@ const AdminPage = () => {
                 </h4>
                 <form
                   onSubmit={handleSubmit}
-                  className="flex flex-col justify-center items-end gap-4 w-full mx-auto"
+                  className="flex flex-col gap-4 w-full mx-auto"
                 >
                   {/* Image Upload */}
-                  <div className="w-full">
-                    <Label htmlFor="imageUpload">Image</Label>
-                    <input
-                      id="imageUpload"
-                      type="file"
-                      onChange={(e) => {
-                        setImageFile(e.target.files?.[0]);
-                      }}
-                      className="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-200 dark:file:bg-neutral-700"
-                    />
-                  </div>
-
-                  {/* Thumbnail Upload */}
-                  <div className="w-full">
-                    <Label htmlFor="thumbnailUpload">Thumbnail</Label>
-                    <input
-                      id="thumbnailUpload"
-                      type="file"
-                      onChange={(e) => {
-                        setThumbnailFile(e.target.files?.[0]);
-                      }}
-                      className="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-200 dark:file:bg-neutral-700"
-                    />
+                  <div className="w-full flex justify-between">
+                    <div>
+                      <Label htmlFor="imageUpload">Image</Label>
+                      <input
+                        id="imageUpload"
+                        type="file"
+                        onChange={(e) => setImageFile(e.target.files?.[0])}
+                        className="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-neutral-200 dark:file:bg-neutral-700"
+                      />
+                    </div>
+                    <div className="flex justify-end items-end">
+                      <button
+                        onClick={handleImageUpload}
+                        className="h-10 w-30 px-8 py-2 rounded-md bg-teal-500 text-white font-bold transition duration-200 hover:bg-white hover:text-black border-2 border-transparent hover:border-teal-500"
+                      >
+                        Upload
+                      </button>
+                    </div>
                   </div>
 
                   {/* Title Input */}
@@ -268,7 +246,19 @@ const AdminPage = () => {
                       onChange={(e) => setDeploy(e.target.value)}
                       placeholder="https://project-live-url.com"
                       className="mt-1 block p-2 w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-neutral-900 dark:text-white sm:text-sm"
-                      required
+                    />
+                  </div>
+
+                  {/* Contributors */}
+                  <div className="w-full">
+                    <Label htmlFor="contributors">Contributors</Label>
+                    <input
+                      id="contributors"
+                      type="text"
+                      value={contributors}
+                      onChange={(e) => setContributors(e.target.value)}
+                      placeholder="Tyler Durden"
+                      className="mt-1 block p-2 w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-neutral-900 dark:text-white sm:text-sm"
                     />
                   </div>
 
@@ -285,11 +275,12 @@ const AdminPage = () => {
                       required
                     />
                   </div>
-                  <ModalFooter className="w-full bg-red-500">
-                    <button type="submit" className="p-[3px] relative">
+
+                  <ModalFooter className="w-full">
+                    <button type="submit" className="p-[3px] relative w-full">
                       <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
-                      <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
-                      Add to DB
+                      <div className="px-8 py-2 bg-black rounded-[6px] relative group transition duration-200 text-white hover:bg-transparent">
+                        Add to DB
                       </div>
                     </button>
                   </ModalFooter>

@@ -10,7 +10,7 @@ import Image from "next/image";
 import { IconCpu2, IconFolder, IconMail, IconUser } from "@tabler/icons-react";
 import { FloatingDock } from "./components/ui/floating-dock";
 import { useSystemTheme } from "@/hooks/useTheme";
-import { checkCurrentSession, deleteCurrentSession } from '@/lib/appwriteConfig';
+
 
 
 export default function Home() {
@@ -27,19 +27,6 @@ export default function Home() {
     }
   }, [theme]);
 
-  //Session checker
-  useEffect(() => {
-    // Use an async function to handle session check and deletion
-    const handleSession = async () => {
-      const session = await checkCurrentSession();
-      if (session) {
-        await deleteCurrentSession(); // Only delete if there is an active session
-      }
-    };
-
-    handleSession();
-  }, []);
-
   // Consolidated smooth scroll handler
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -47,7 +34,7 @@ export default function Home() {
     const targetElement = document.getElementById(targetId);
     if (targetElement) {
       window.scrollTo({
-        top: targetElement.offsetTop + 50, // Adjust the offset for fixed headers if necessary
+        top: targetElement.offsetTop, // Adjust the offset for fixed headers if necessary
         behavior: 'smooth', // Smooth scroll
       });
     }
