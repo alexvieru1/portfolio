@@ -27,6 +27,7 @@ export default function Contact() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const hiddenButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
@@ -35,8 +36,9 @@ export default function Contact() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    // Hide the keyboard by blurring the input
+    // Hide the keyboard by blurring the input and focusing the hidden button
     inputRef.current?.blur();
+    hiddenButtonRef.current?.focus();
   
     // Delay of 500ms before starting the loading process
     setTimeout(() => {
@@ -89,6 +91,9 @@ export default function Contact() {
       
       {/* Loader */}
       <Loader loadingStates={loadingStates} loading={loading} duration={850} loop={false} />
+      
+      {/* Hidden button for focusing */}
+      <button ref={hiddenButtonRef} style={{ visibility: "hidden", position: "absolute" }} />
       
       <p className="mt-10 sm:mt-20 text-xl text-center sm:text-2xl dark:text-white text-black">
         or if you need more time
