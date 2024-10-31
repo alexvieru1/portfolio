@@ -32,7 +32,7 @@ export default function Projects() {
   }, []);
 
   const cards = projects.map((project, index) => ({
-    id: index,
+    id: index+1,
     content: (
       <div>
         <p className="font-bold md:text-4xl text-xl text-white">
@@ -44,11 +44,22 @@ export default function Projects() {
         <p className="font-normal text-base my-4 max-w-lg text-neutral-200">
           {project.details}
         </p>
-        <div className="flex justify-between">
+        <div
+          className={`flex ${
+            project.contributors && project.deploy
+              ? "justify-between"
+              : project.contributors
+              ? "justify-start"
+              : project.deploy
+              ? "justify-end"
+              : ""
+          }`}
+        >
           {project.contributors && (
-            <p className="text-neutral-300">
-              Contributors: {project.contributors}
-            </p>
+            <div className="flex flex-col">
+              <p className="text-neutral-300">Contributors:</p>
+              <p className="text-neutral-300">{project.contributors}</p>
+            </div>
           )}
           {project.deploy && (
             <a
