@@ -3,7 +3,7 @@
 import { IconMail } from "@tabler/icons-react";
 import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input";
 import { MultiStepLoader as Loader } from "./ui/multi-step-loader";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 export default function Contact() {
   const placeholders = [
@@ -26,6 +26,7 @@ export default function Contact() {
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
@@ -33,11 +34,12 @@ export default function Contact() {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
   
-    // Delay of 500ms, then start the loading process
+    // Hide the keyboard by blurring the input
+    inputRef.current?.blur();
+  
+    // Delay of 500ms before starting the loading process
     setTimeout(() => {
-      // Start the loading animation
       setLoading(true);
   
       // Wait for the loader to complete, then open WhatsApp and reset states
@@ -51,18 +53,18 @@ export default function Contact() {
           : `https://wa.me/40733139412?text=${messageText}`;          // Open WhatsApp web in a new tab on desktop
   
         if (isMobile) {
-          // Open WhatsApp directly on mobile
-          window.location.href = whatsappUrl;
+          window.location.href = whatsappUrl;  // Open WhatsApp directly on mobile
         } else {
-          // Open WhatsApp Web in a new tab on desktop
-          window.open(whatsappUrl, "_blank");
+          window.open(whatsappUrl, "_blank");  // Open WhatsApp Web in a new tab on desktop
         }
   
         // Reset loader and message after opening the new window
-        setLoading(false);
-        setMessage("");
+        setTimeout(() => {
+          setLoading(false);
+          setMessage("");
+        }, 500); // Delay before setting loading to false
       }, loadingStates.length * 850); // Adjust this to match the loader duration
-    }, 500); // 500ms delay
+    }, 500); // 500ms delay before setting loading to true
   };
   
 
@@ -82,6 +84,7 @@ export default function Contact() {
         placeholders={placeholders}
         onChange={handleChange}
         onSubmit={onSubmit}
+        ref={inputRef}  // Attach the ref here
       />
       
       {/* Loader */}
