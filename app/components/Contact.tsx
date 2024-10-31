@@ -34,25 +34,37 @@ export default function Contact() {
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
+  
     // Delay of 500ms, then start the loading process
     setTimeout(() => {
       // Start the loading animation
       setLoading(true);
-
+  
       // Wait for the loader to complete, then open WhatsApp and reset states
       setTimeout(() => {
-        const whatsappUrl = `https://wa.me/40733139412?text=${encodeURIComponent(
-          message
-        )}`;
-        window.location.href = whatsappUrl;
-
+        const messageText = encodeURIComponent(message);
+  
+        // Check if on mobile device
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const whatsappUrl = isMobile
+          ? `whatsapp://send?phone=40733139412&text=${messageText}`  // Open WhatsApp app on mobile
+          : `https://wa.me/40733139412?text=${messageText}`;          // Open WhatsApp web in a new tab on desktop
+  
+        if (isMobile) {
+          // Open WhatsApp directly on mobile
+          window.location.href = whatsappUrl;
+        } else {
+          // Open WhatsApp Web in a new tab on desktop
+          window.open(whatsappUrl, "_blank");
+        }
+  
         // Reset loader and message after opening the new window
         setLoading(false);
         setMessage("");
       }, loadingStates.length * 850); // Adjust this to match the loader duration
     }, 500); // 500ms delay
   };
+  
 
   const mailTo = () => {
     window.location.href = "mailto:contact@alex-vieru.dev";
@@ -71,23 +83,15 @@ export default function Contact() {
         onChange={handleChange}
         onSubmit={onSubmit}
       />
-
+      
       {/* Loader */}
-      <Loader
-        loadingStates={loadingStates}
-        loading={loading}
-        duration={850}
-        loop={false}
-      />
-
+      <Loader loadingStates={loadingStates} loading={loading} duration={850} loop={false} />
+      
       <p className="mt-10 sm:mt-20 text-xl text-center sm:text-2xl dark:text-white text-black">
         or if you need more time
       </p>
       <div className="mt-5 sm:mt-10 mb-36 sm:mb-36">
-        <button
-          onClick={mailTo}
-          className="inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
-        >
+        <button onClick={mailTo} className="inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
           <IconMail /> <p className="ml-2 font-light">Send an email</p>
         </button>
       </div>
