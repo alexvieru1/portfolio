@@ -83,7 +83,7 @@ export default function Projects() {
       id="projects"
       className="h-screen flex flex-col items-center justify-center bg-transparent"
     >
-      <div className="w-full lg:w-[65%] flex justify-start">
+      <div className="w-full lg:w-[65%] flex justify-center lg:justify-atart">
         <TextGenerateEffect
           className="px-4 text-4xl lg:text-6xl font-bold text-start"
           words="My recent work"
