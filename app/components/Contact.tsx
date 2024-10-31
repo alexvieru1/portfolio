@@ -42,8 +42,10 @@ export default function Contact() {
 
       // Wait for the loader to complete, then open WhatsApp and reset states
       setTimeout(() => {
-        const whatsappUrl = `https://wa.me/40733139412?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, "_blank");
+        const whatsappUrl = `https://wa.me/40733139412?text=${encodeURIComponent(
+          message
+        )}`;
+        window.location.href = whatsappUrl;
 
         // Reset loader and message after opening the new window
         setLoading(false);
@@ -69,15 +71,23 @@ export default function Contact() {
         onChange={handleChange}
         onSubmit={onSubmit}
       />
-      
+
       {/* Loader */}
-      <Loader loadingStates={loadingStates} loading={loading} duration={850} loop={false} />
-      
+      <Loader
+        loadingStates={loadingStates}
+        loading={loading}
+        duration={850}
+        loop={false}
+      />
+
       <p className="mt-10 sm:mt-20 text-xl text-center sm:text-2xl dark:text-white text-black">
         or if you need more time
       </p>
       <div className="mt-5 sm:mt-10 mb-36 sm:mb-36">
-        <button onClick={mailTo} className="inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+        <button
+          onClick={mailTo}
+          className="inline-flex h-12 animate-shimmer items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50"
+        >
           <IconMail /> <p className="ml-2 font-light">Send an email</p>
         </button>
       </div>
