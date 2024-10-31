@@ -124,7 +124,9 @@ const TechStack = () => {
           words="Tech Stack"
         />
       </div>
-        <InfiniteMovingCards items={techStack} speed="normal" />
+      <div className="w-full max-w-[99%] md:max-w-[80%] lg:max-w-[70%] xl:max-w-[60%] rounded-md flex flex-col antialiased items-center justify-center relative overflow-hidden">
+        <InfiniteMovingCards items={techStack} speed="normal" direction="right" />
+      </div>
     </div>
   );
 };
