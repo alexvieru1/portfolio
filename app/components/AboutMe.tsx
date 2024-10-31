@@ -9,7 +9,7 @@ export default function AboutMe() {
   return (
     <div
       id="about-me"
-      className="h-screen flex flex-col items-center justify-center bg-transparent space-y-10"
+      className="h-1/2 flex flex-col items-center justify-center bg-transparent space-y-10"
     >
       {/* Animate TextGenerateEffect when in view */}
       <motion.div

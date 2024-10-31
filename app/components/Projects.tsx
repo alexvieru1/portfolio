@@ -56,7 +56,7 @@ export default function Projects() {
           }`}
         >
           {project.contributors && (
-            <div className="flex flex-col">
+            <div className="flex text-xs italic flex-col">
               <p className="text-neutral-300">Contributors:</p>
               <p className="text-neutral-300">{project.contributors}</p>
             </div>
@@ -81,7 +81,7 @@ export default function Projects() {
   return (
     <div
       id="projects"
-      className="h-screen flex flex-col items-center justify-center bg-transparent"
+      className="h-screen flex flex-col items-center justify-center bg-transparent lg:mt-40"
     >
       <div className="w-full lg:w-[65%] flex justify-center lg:justify-atart">
         <TextGenerateEffect
