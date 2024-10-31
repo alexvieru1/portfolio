@@ -118,7 +118,7 @@ const TechStack = () => {
       id="tech-stack"
       className="h-screen flex flex-col items-center justify-center bg-transparent"
     >
-      <div className="w-full lg:w-[65%] flex justify-end">
+      <div className="w-full lg:w-[65%] flex justify-center lg:justify-end">
         <TextGenerateEffect
           className="p-4 text-4xl lg:text-6xl font-bold text-end"
           words="Tech Stack"
